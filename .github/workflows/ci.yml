@@ -1,0 +1,62 @@
+name: CI
+
+# Builds and tests on every push to any branch and on pull requests. Never deploys.
+on:
+  push:
+  pull_request:
+
+# A newer push to the same branch cancels the run still in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: backend/global.json
+
+      - name: Restore
+        run: dotnet restore MaintainOps.slnx
+
+      - name: Build
+        run: dotnet build MaintainOps.slnx --no-restore
+
+      - name: Test
+        run: dotnet test MaintainOps.slnx --no-build
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Type-checks (tsc -b) and then bundles.
+      - name: Build
+        run: npm run build

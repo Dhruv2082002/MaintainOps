@@ -1,0 +1,6 @@
+@MaintainOps.Api_HostAddress = http://localhost:5286
+
+GET {{MaintainOps.Api_HostAddress}}/
+Accept: application/json
+
+###

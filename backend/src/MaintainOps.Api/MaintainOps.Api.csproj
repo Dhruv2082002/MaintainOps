@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\MaintainOps.Application\MaintainOps.Application.csproj" />
+    <ProjectReference Include="..\MaintainOps.Infrastructure\MaintainOps.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

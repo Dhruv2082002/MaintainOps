@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MaintainOps.Api/MaintainOps.Api.csproj" />
+    <Project Path="src/MaintainOps.Application/MaintainOps.Application.csproj" />
+    <Project Path="src/MaintainOps.Domain/MaintainOps.Domain.csproj" />
+    <Project Path="src/MaintainOps.Infrastructure/MaintainOps.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MaintainOps.Api.IntegrationTests/MaintainOps.Api.IntegrationTests.csproj" />
+    <Project Path="tests/MaintainOps.Application.Tests/MaintainOps.Application.Tests.csproj" />
+    <Project Path="tests/MaintainOps.Domain.Tests/MaintainOps.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
