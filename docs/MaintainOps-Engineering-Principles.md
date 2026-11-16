@@ -147,6 +147,8 @@ Examples include:
 - external API resilience
 - feature flags
 
+PostgreSQL and EF Core are the exception: Foundations already introduces them, because ASP.NET Core Identity stores user accounts in PostgreSQL through EF Core (see Environments).
+
 These technologies must **not receive chronological roadmap stages of their own**.
 
 There should never be a sprint called:
