@@ -22,6 +22,7 @@ backend/                      ASP.NET Core API, layered Clean Architecture
     MaintainOps.Api.IntegrationTests/
 frontend/                     React + TypeScript (Vite)
 docs/                         product definition and engineering principles
+learning-notes/               session notes: decisions, concepts, what went differently
 .github/workflows/            CI
 ```
 
