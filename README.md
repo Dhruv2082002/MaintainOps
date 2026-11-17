@@ -21,6 +21,7 @@ backend/                      ASP.NET Core API, layered Clean Architecture
     MaintainOps.Application.Tests/
     MaintainOps.Api.IntegrationTests/
 frontend/                     React + TypeScript (Vite)
+infra/                        Bicep for the Azure resources
 docs/                         product definition and engineering principles
 learning-notes/               session notes: decisions, concepts, what went differently
 .github/workflows/            CI
