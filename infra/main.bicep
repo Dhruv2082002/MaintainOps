@@ -43,3 +43,7 @@ module web 'modules/appService.bicep' = {
 
 output apiUrl string = 'https://${api.outputs.hostName}'
 output webUrl string = 'https://${web.outputs.hostName}'
+output registryName string = registry.outputs.name
+output registryLoginServer string = registry.outputs.loginServer
+output apiName string = api.outputs.name
+output webName string = web.outputs.name

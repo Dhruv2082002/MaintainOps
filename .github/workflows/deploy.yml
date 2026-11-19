@@ -1,0 +1,84 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: rg-maintainops-prod
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Sign in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Preview infrastructure changes
+        run: >
+          az deployment group what-if
+          --resource-group "$RESOURCE_GROUP"
+          --template-file infra/main.bicep
+          --parameters imageTag=${{ github.sha }}
+
+      - name: Deploy infrastructure
+        id: infra
+        run: >
+          az deployment group create
+          --resource-group "$RESOURCE_GROUP"
+          --name "deploy-${{ github.run_number }}"
+          --template-file infra/main.bicep
+          --parameters imageTag=${{ github.sha }}
+          --query properties.outputs
+          --output json
+          | jq -r 'to_entries[] | "\(.key)=\(.value.value)"'
+          >> "$GITHUB_OUTPUT"
+
+      - name: Sign in to the registry
+        run: az acr login --name "${{ steps.infra.outputs.registryName }}"
+
+      - name: Build and push the API image
+        env:
+          IMAGE: ${{ steps.infra.outputs.registryLoginServer }}/maintainops-api:${{ github.sha }}
+        run: |
+          docker build --file backend/src/MaintainOps.Api/Dockerfile --tag "$IMAGE" backend
+          docker push "$IMAGE"
+
+      - name: Build and push the web image
+        env:
+          IMAGE: ${{ steps.infra.outputs.registryLoginServer }}/maintainops-web:${{ github.sha }}
+        run: |
+          docker build --tag "$IMAGE" frontend
+          docker push "$IMAGE"
+
+      - name: Restart the sites
+        run: |
+          az webapp restart --resource-group "$RESOURCE_GROUP" --name "${{ steps.infra.outputs.apiName }}"
+          az webapp restart --resource-group "$RESOURCE_GROUP" --name "${{ steps.infra.outputs.webName }}"
+
+      - name: Smoke test the API
+        run: >
+          curl --fail --silent --show-error
+          --retry 10 --retry-delay 15 --retry-all-errors
+          --max-time 30
+          "${{ steps.infra.outputs.apiUrl }}/"

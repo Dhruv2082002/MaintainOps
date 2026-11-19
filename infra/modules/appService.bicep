@@ -47,3 +47,4 @@ resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 output hostName string = site.properties.defaultHostName
+output name string = site.name

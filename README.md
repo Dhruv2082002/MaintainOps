@@ -24,7 +24,7 @@ frontend/                     React + TypeScript (Vite)
 infra/                        Bicep for the Azure resources
 docs/                         product definition and engineering principles
 learning-notes/               session notes: decisions, concepts, what went differently
-.github/workflows/            CI
+.github/workflows/            CI and deploy
 ```
 
 ## Prerequisites
@@ -56,5 +56,5 @@ Other frontend scripts: `npm run lint`, `npm test`, `npm run build`, `npm run fo
 ## Branches
 
 - `dev`: day-to-day work. CI builds and tests every push; nothing is deployed.
-- `main`: merging `dev` into `main` is how a release ships. Only `main` deploys (the deploy
-  workflow is not set up yet).
+- `main`: merging `dev` into `main` is how a release ships. Only `main` deploys, and each
+  deploy waits for approval in the `production` environment.
