@@ -1,0 +1,45 @@
+name: Teardown
+
+on:
+  schedule:
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: rg-maintainops-prod
+
+jobs:
+  teardown:
+    name: Teardown
+    runs-on: ubuntu-latest
+    environment: teardown
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Sign in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Delete the sites, the plan and the registry
+        run: |
+          for type in Microsoft.Web/sites Microsoft.Web/serverfarms Microsoft.ContainerRegistry/registries; do
+            ids=$(az resource list --resource-group "$RESOURCE_GROUP" --resource-type "$type" --query "[].id" --output tsv)
+            if [ -n "$ids" ]; then
+              echo "Deleting $type"
+              az resource delete --ids $ids
+            else
+              echo "No $type, skipping"
+            fi
+          done
